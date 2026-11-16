@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+
+<html lang="de-CH">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>EduSwiss LP21 | 100'000 Level, Weltmusik, KI & Admin</title>
+
+  <style>
+
+    :root {
+
+      --green: #58cc02; --green-dark: #58a700; --green-bg: #d7ffb8;
+
+      --blue: #1cb0f6; --blue-dark: #1899d6; --blue-bg: #ddf4ff;
+
+      --red: #ff4b4b; --red-dark: #ea2b2b; --red-bg: #ffdfe0;
+
+      --gold: #ffc800; --gold-dark: #e5a500;
+
+      --purple: #ce82ff; --purple-dark: #a55eea;
+
+      --dark: #0f172a; --border: #e5e5e5; --surface: #f7f7f7; --text: #3c3c3c; --muted: #777777;
+
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+
+    body { background: #fff; color: var(--text); display: flex; flex-direction: column; min-height: 100vh; padding-bottom: 78px; }
+
+    header { position: sticky; top: 0; z-index: 50; background: #fff; border-bottom: 2px solid var(--border); padding: 10px 14px; }
+
+    .header-inner { max-width: 960px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    .app-title { font-weight: 900; font-size: 1.15rem; color: var(--green); cursor: pointer; user-select: none; }
+
+    select, .pill-btn { padding: 7px 11px; border-radius: 12px; border: 2px solid var(--border); border-bottom-width: 4px; font-weight: 800; font-size: 0.84rem; background: #fff; cursor: pointer; }
+
+    .pill-btn.ai { background: var(--purple); color: #fff; border-color: var(--purple-dark); }
+
+    .pill-btn.gold { background: var(--gold); color: #0f172a; border-color: var(--gold-dark); }
+
+    .pill-btn.danger { background: var(--red); color: #fff; border-color: var(--red-dark); }
+
+    .view { display: none; max-width: 760px; width: 100%; margin: 0 auto; padding: 16px 14px; flex: 1; }
+
+    .view.active { display: block; }
+
+ 
+
+    .world-nav { display: flex; justify-content: space-between; align-items: center; background: var(--surface); padding: 10px 12px; border-radius: 14px; margin-bottom: 14px; border: 2px solid var(--border); font-weight: 800; gap: 6px; flex-wrap: wrap; }
+
+    .unit-banner { background: linear-gradient(135deg, #58cc02, #46a302); color: #fff; border-radius: 16px; padding: 14px 18px; margin-bottom: 22px; box-shadow: 0 4px 0 var(--green-dark); display: flex; justify-content: space-between; align-items: center; }
+
+    .unit-banner.blue { background: linear-gradient(135deg, #1cb0f6, #0088cc); box-shadow: 0 4px 0 var(--blue-dark); }
+
+    .unit-banner.purple { background: linear-gradient(135deg, #ce82ff, #9b51e0); box-shadow: 0 4px 0 var(--purple-dark); }
+
+    .unit-banner.dark { background: linear-gradient(135deg, #1e293b, #0f172a); box-shadow: 0 4px 0 #020617; }
+
+    .path-grid { display: flex; flex-direction: column; align-items: center; gap: 18px; margin-bottom: 24px; }
+
+    .node-wrap { display: flex; flex-direction: column; align-items: center; }
+
+    .start-tag { background: #fff; color: var(--green-dark); border: 2px solid var(--border); padding: 4px 12px; border-radius: 10px; font-weight: 900; font-size: 0.78rem; margin-bottom: 6px; box-shadow: 0 3px 0 var(--border); animation: bounce 1.3s infinite; }
+
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+
+    .node-btn { width: 74px; height: 68px; border-radius: 50%; border: none; background: var(--green); box-shadow: 0 6px 0 var(--green-dark); color: #fff; font-size: 1.05rem; font-weight: 900; cursor: pointer; }
+
+    .node-btn.done { background: var(--gold); box-shadow: 0 6px 0 var(--gold-dark); }
+
+    .node-btn.boss { background: var(--purple); box-shadow: 0 6px 0 var(--purple-dark); }
+
+    .node-btn.locked { background: #e5e5e5; box-shadow: 0 6px 0 #cccccc; color: #a3a3a3; cursor: not-allowed; }
+
+    .node-label { margin-top: 6px; font-weight: 800; font-size: 0.82rem; color: var(--muted); }
+
+    .game-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+
+    .game-frame-box { background: #0f172a; border-radius: 18px; padding: 12px; border: 3px solid #38bdf8; color: #fff; }
+
+    .game-iframe { width: 100%; height: 450px; border: none; border-radius: 12px; background: #fff; }
+
+ 
+
+    .lesson-top { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+
+    .close-lesson { background: none; border: none; font-size: 1.4rem; cursor: pointer; font-weight: 800; color: var(--muted); }
+
+    .prog-track { flex: 1; height: 15px; background: var(--border); border-radius: 10px; overflow: hidden; }
+
+    .prog-fill { height: 100%; background: var(--green); width: 0%; transition: 0.3s; }
+
+    .mascot-row { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+
+    .mascot-avatar { font-size: 2.5rem; background: var(--green-bg); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 2px solid var(--green); }
+
+    .speech-bubble { background: #fff; border: 2px solid var(--border); border-radius: 16px; padding: 13px 16px; font-size: 1.08rem; font-weight: 800; line-height: 1.38; flex: 1; box-shadow: 0 3px 0 var(--border); }
+
+    .mc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .choice-card { background: #fff; border: 2px solid var(--border); border-bottom-width: 4px; border-radius: 14px; padding: 14px; font-weight: 700; cursor: pointer; text-align: center; }
+
+    .choice-card.selected { background: var(--blue-bg); border-color: var(--blue); color: var(--blue-dark); }
+
+    input[type="text"], input[type="number"], textarea.code-box, textarea.plain-box { width: 100%; padding: 11px; font-size: 0.96rem; font-weight: 700; border: 2px solid var(--border); border-radius: 12px; background: var(--surface); outline: none; }
+
+    textarea.code-box { font-family: monospace; background: #0f172a; color: #4ade80; min-height: 130px; font-size: 0.88rem; }
+
+    .accent-bar, .bank-box { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; justify-content: center; }
+
+    .accent-btn, .word-chip { background: #fff; border: 2px solid var(--border); border-bottom-width: 4px; padding: 7px 12px; border-radius: 10px; font-weight: 700; cursor: pointer; }
+
+    .word-chip.used { background: var(--border); color: transparent; pointer-events: none; }
+
+    .slot-box { min-height: 50px; border-top: 2px solid var(--border); border-bottom: 2px solid var(--border); padding: 8px 0; margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .chat-box { max-height: 290px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; padding: 10px; background: var(--surface); border-radius: 14px; border: 2px solid var(--border); }
+
+    .msg-ai { background: #fff; border: 2px solid var(--border); padding: 10px 14px; border-radius: 14px; align-self: flex-start; max-width: 92%; line-height: 1.48; }
+
+    .msg-user { background: var(--blue); color: #fff; padding: 10px 14px; border-radius: 14px; align-self: flex-end; max-width: 85%; font-weight: 700; }
+
+    .step-box { background: var(--surface); border-left: 4px solid var(--blue); padding: 12px; margin-top: 10px; line-height: 1.55; font-weight: 600; border-radius: 0 10px 10px 0; }
+
+    .check-panel { margin-top: 16px; padding: 14px; border-radius: 16px; border: 2px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+    .check-panel.correct { background: var(--green-bg); border-color: var(--green); color: var(--green-dark); }
+
+    .check-panel.wrong { background: var(--red-bg); border-color: var(--red); color: var(--red-dark); }
+
+    .btn-primary { background: var(--green); color: #fff; border: none; border-bottom: 4px solid var(--green-dark); padding: 11px 20px; border-radius: 14px; font-weight: 900; text-transform: uppercase; cursor: pointer; }
+
+    .check-panel.wrong .btn-primary { background: var(--red); border-bottom-color: var(--red-dark); }
+
+    .panel-card { background: #fff; border: 2px solid var(--border); border-radius: 16px; padding: 14px; margin-bottom: 12px; }
+
+    nav.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 2px solid var(--border); display: flex; justify-content: space-around; padding: 6px 0; z-index: 60; }
+
+    .nav-item { background: none; border: none; display: flex; flex-direction: column; align-items: center; font-size: 0.72rem; font-weight: 800; color: var(--muted); cursor: pointer; }
+
+    .nav-item.active { color: var(--blue); }
+
+    @media (max-width: 580px) { .mc-grid { grid-template-columns: 1fr; } .game-iframe { height: 390px; } }
+
+  </style>
+
+</head>
+
+<body>
+
+ 
+
+<div id="globalBanner" style="display:none;background:#ffc800;color:#0f172a;font-weight:900;text-align:center;padding:8px 12px;font-size:0.88rem;border-bottom:2px solid #e5a500;"></div>
+
+ 
+
+<header>
+
+  <div class="header-inner">
+
+    <div class="app-title" onclick="secretAdminTrigger()" title="EduSwiss LP21">🦉 EduSwiss LP21</div>
+
+    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+
+      <select id="subjectSelect" onchange="onSubjectChange()">
+
+        <option value="math">📐 Mathematik (LP21)</option>
+
+        <option value="deutsch">📖 Deutsch (LP21)</option>
+
+        <option value="music">🎵 Musik & Weltlieder</option>
+
+        <option value="french">🇫🇷 Französisch (dis donc!)</option>
+
+        <option value="english">🇬🇧 Englisch (LP21)</option>
+
+        <option value="italian">🇮🇹 Italienisch</option>
+
+        <option value="spanish">🇪🇸 Spanisch</option>
+
+        <option value="latin">🏛️ Latein (prima.nova)</option>
+
+        <option value="code">💻 Informatik & Code</option>
+
+      </select>
+
+      <button class="pill-btn ai" onclick="startPlacementTest()">🧠 KI-Test</button>
+
+      <button class="pill-btn" onclick="exportStudentSync()" title="Stand exportieren">📤 Sync</button>
+
+    </div>
+
+    <div style="font-weight:800;font-size:0.86rem;">
+
+Lvl 1/100'000 • ⚡0 • ❤️5
+
+
+
+
+« 100
+◀
+Welt 1 / 10'000
+📍 Aktuell
+▶
+100 »
+
+
+
+♟️ Lichess Schach
+🔢 2048
+🔷 Hextris
+🏎️ HexGL 3D
+💣 Minesweeper
+⛏️ 3D-Blockwelt
+
+
+Wähle oben eines der 6 Spiele aus!
+
+
+✕
+
+
+
+🦉
+Lade Aufgabe...
+
+
+
+
+
+
+é
+è
+ê
+à
+ç
+♯
+♭
+
+
+
+
+
+
+
+
+
+
+Bereit?
+Prüfen
+
+
+🤖 Super-KI & MathBot ProLöst Gleichungen, Brüche, Prozent, Musiktheorie, Sprachen & Code
+
+
+
+✨ EduSwiss KI: Frag mich alles! Beispiele:
+• 3x + 6 = 21 oder x^2 - 9 = 0
+• 3/4 + 2/5 oder 25% von 480
+• Welche Tonart hat 2 Kreuze? oder Passé composé erklären
+
+
+
+Fragen
+
+
+
+💼 EduSwiss Pitch-BeraterErstellt überzeugende Argumente für Kollegen, Klassen & Schulen
+
+
+
+Wen möchtest du überzeugen?
+
+👥 Schulkollegen
+👩‍🏫 Lehrperson / Schulleitung
+👨‍👩‍👧 Eltern
+🛡️ Einwand entkräften
+
+Wähle oben eine Zielgruppe – ich schreibe dir eine fertige Nachricht zum Kopieren!
+📋 Nachricht kopieren
+
+
+🛡️ ADMIN-KONTROLLZENTRUMNur für dich sichtbar • Kollegen haben keinen Zugriff auf diesen Tab
+Sperren 🔒
+
+
+⚙️ Globale Regeln (für alle Level & Fächer)
+
+
+
+Gesamt-Level (Standard 100'000):
+
+Aufgaben pro Level (Standard 15):
+
+XP-Multiplikator (z.B. 1x, 5x):
+
+Start-Herzen:
+
+📢 Globales Banner oben einblenden:
+
+✅ Einstellungen speichern
+
+
+👥 Kollegen-Zugriff, Sync & Zurücksetzen
+Lass deine Kollegen oben auf «📤 Sync» klicken und dir ihren Code senden. Hier kannst du ihren Stand laden, prüfen oder zurücksetzen:
+
+
+📥 Kollegen-Stand laden
+🚀 Alle Fächer auf Level X
+🗑️ Spielstand zurücksetzen
+
+
+
+
+💻 Live-Code-Editor (Nur Admin)
+Hier kannst du direkt JavaScript-Code eingeben und live ausführen:
+worldSongs.push({ title: "Wellerman", artist: "Nathan Evans", origin: "Neuseeland / Schottland", genre: "Sea Shanty" });
+customTasks.math.push({ icon: "🚀", type: "input", q: "Admin-Spezial: 25 × 25 = ?", a: ["625"] });
+⚡ Code direkt ausführen
+
+
+
+🛤100k Pfad
+🎮Spiele
+🤖Super-KI
+💼Pitch-Bot
+🛡️Admin
+
+
+const ADMIN_PIN = "2121";
+let isAdminAuthenticated = false;
+let titleClickCount = 0;
+
+function secretAdminTrigger() {
+titleClickCount++;
+if (titleClickCount >= 5) {
+titleClickCount = 0;
+if (isAdminAuthenticated) {
+openTab("admin");
+return;
+}
+const pin = prompt("🛡️ Admin-Authentifizierung (PIN eingeben):");
+if (pin === ADMIN_PIN) {
+isAdminAuthenticated = true;
+document.getElementById("nav-admin").style.display = "flex";
+syncAdminInputs();
+openTab("admin");
+} else if (pin !== null) {
+alert("❌ Zugriff verweigert.");
+}
+}
+}
+
+function logoutAdmin() {
+isAdminAuthenticated = false;
+document.getElementById("nav-admin").style.display = "none";
+openTab("path");
+}
+
+const SAVE_KEY = "eduswiss_100k_save_v5";
+const CFG_KEY = "eduswiss_100k_cfg_v5";
+const memStore = {};
+const getStore = k => { try { return localStorage.getItem(k); } catch (e) { return memStore[k] || null; } };
+const setStore = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { memStore[k] = v; } };
+
+let cfg = {
+maxLevels: 100000,
+tasksPerLevel: 15,
+xpMultiplier: 1,
+maxHearts: 5,
+unlockAll: false,
+banner: ""
+};
+try {
+const sc = JSON.parse(getStore(CFG_KEY) || "null");
+if (sc) cfg = { ...cfg, ...sc };
+} catch (e) {}
+
+const defaultLevels = { math: 1, deutsch: 1, music: 1, french: 1, english: 1, italian: 1, spanish: 1, latin: 1, code: 1 };
+let state = { player: "Schüler", xp: 0, levels: { ...defaultLevels } };
+try {
+const ss = JSON.parse(getStore(SAVE_KEY) || "null");
+if (ss) {
+state.player = ss.player || "Schüler";
+state.xp = ss.xp || 0;
+state.levels = { ...defaultLevels, ...(ss.levels || {}) };
+}
+} catch (e) {}
+
+let hearts = cfg.maxHearts;
+
+function save() {
+setStore(SAVE_KEY, JSON.stringify(state));
+const subj = document.getElementById("subjectSelect").value;
+document.getElementById("userLvlVal").innerText = (state.levels[subj] || 1).toLocaleString("de-CH");
+document.getElementById("maxLvlHdr").innerText = cfg.maxLevels.toLocaleString("de-CH");
+document.getElementById("xpVal").innerText = state.xp.toLocaleString("de-CH");
+document.getElementById("heartVal").innerText = hearts;
+}
+
+function applyBanner() {
+const b = document.getElementById("globalBanner");
+if (cfg.banner && cfg.banner.trim()) {
+b.style.display = "block";
+b.innerText = "📢 " + cfg.banner;
+} else {
+b.style.display = "none";
+}
+}
+
+function exportStudentSync() {
+const name = prompt("Dein Vorname für den Spielstand-Export:", state.player) || state.player;
+state.player = name;
+save();
+const payload = btoa(unescape(encodeURIComponent(JSON.stringify({ state, ts: new Date().toLocaleString("de-CH") }))));
+prompt("Kopiere diesen Sync-Code und schicke ihn an den Admin:", payload);
+}
+
+function importColleagueSync() {
+if (!isAdminAuthenticated) return;
+const raw = document.getElementById("adminSyncInput").value.trim();
+if (!raw) return alert("Bitte zuerst den Sync-Code einfügen.");
+try {
+const decoded = JSON.parse(decodeURIComponent(escape(atob(raw))));
+if (decoded && decoded.state) {
+state = { ...state, ...decoded.state, levels: { ...defaultLevels, ...(decoded.state.levels || {}) } };
+save();
+renderPath();
+const summary = Object.entries(state.levels).map(([k, v]) => ${k.toUpperCase()}: Lvl ${v}).join(" • ");
+document.getElementById("colleagueReport").innerHTML = <div class="step-box"><strong>✅ Stand von «${state.player}» geladen (${decoded.ts || "aktuell"}):</strong><br>XP: ${state.xp} | ${summary}</div>;
+}
+} catch (e) {
+alert("❌ Ungültiger Sync-Code!");
+}
+}
+
+function adminResetProgress() {
+if (!isAdminAuthenticated) return;
+const choice = prompt("Was möchtest du zurücksetzen?\n1 = Nur aktuelles Fach auf Level 1\n2 = KOMPLETTER Spielstand (alle Fächer & XP auf 0)", "2");
+if (choice === "1") {
+const subj = document.getElementById("subjectSelect").value;
+state.levels[subj] = 1;
+currentWorld = 1;
+save();
+renderPath();
+alert(✓ Fach ${subj.toUpperCase()} wurde auf Level 1 zurückgesetzt.);
+} else if (choice === "2") {
+state.xp = 0;
+state.levels = { ...defaultLevels };
+currentWorld = 1;
+save();
+renderPath();
+alert("✓ Kompletter Spielstand wurde auf Level 1 und 0 XP zurückgesetzt.");
+}
+}
+
+function adminSetAllLevels() {
+if (!isAdminAuthenticated) return;
+const lvl = parseInt(prompt(Alle Fächer auf welches Level setzen (1 – ${cfg.maxLevels})?, "1"), 10);
+if (!lvl || lvl < 1) return;
+Object.keys(state.levels).forEach(k => state.levels[k] = Math.min(cfg.maxLevels, lvl));
+currentWorld = Math.ceil(lvl / 10);
+save();
+renderPath();
+alert(✓ Alle Fächer stehen jetzt auf Level ${lvl}.);
+}
+
+function syncAdminInputs() {
+document.getElementById("admMaxLvl").value = cfg.maxLevels;
+document.getElementById("admTasksPerLvl").value = cfg.tasksPerLevel;
+document.getElementById("admXpMult").value = cfg.xpMultiplier;
+document.getElementById("admHearts").value = cfg.maxHearts;
+document.getElementById("admBannerInput").value = cfg.banner || "";
+document.getElementById("admUnlockAll").checked = !!cfg.unlockAll;
+}
+
+function saveAdminSettings() {
+if (!isAdminAuthenticated) return;
+cfg.maxLevels = Math.max(10, Math.min(1000000, parseInt(document.getElementById("admMaxLvl").value, 10) || 100000));
+cfg.tasksPerLevel = Math.max(5, Math.min(100, parseInt(document.getElementById("admTasksPerLvl").value, 10) || 15));
+cfg.xpMultiplier = Math.max(1, Math.min(100, parseInt(document.getElementById("admXpMult").value, 10) || 1));
+cfg.maxHearts = Math.max(1, Math.min(50, parseInt(document.getElementById("admHearts").value, 10) || 5));
+cfg.banner = document.getElementById("admBannerInput").value;
+cfg.unlockAll = document.getElementById("admUnlockAll").checked;
+hearts = cfg.maxHearts;
+setStore(CFG_KEY, JSON.stringify(cfg));
+applyBanner();
+save();
+renderPath();
+alert("✅ Admin-Einstellungen aktiv!");
+}
+
+function runAdminCode() {
+if (!isAdminAuthenticated) return alert("Nur im Admin-Modus erlaubt!");
+const code = document.getElementById("liveCodeEditor").value.trim();
+const st = document.getElementById("adminCodeStatus");
+try {
+new Function("customTasks", "generators", "worldSongs", "state", "cfg", code)(customTasks, generators, worldSongs, state, cfg);
+save();
+st.style.color = "var(--green-dark)";
+st.innerText = "✓ Code erfolgreich ausgeführt!";
+} catch (e) {
+st.style.color = "var(--red-dark)";
+st.innerText = "✗ Fehler: " + e.message;
+}
+}
+
+const worldSongs = [
+{ title: "Ode an die Freude (9. Sinfonie)", artist: "Ludwig van Beethoven", origin: "Deutschland / Europa-Hymne", genre: "Klassik" },
+{ title: "Eine kleine Nachtmusik", artist: "Wolfgang Amadeus Mozart", origin: "Österreich", genre: "Klassik" },
+{ title: "Die vier Jahreszeiten", artist: "Antonio Vivaldi", origin: "Italien", genre: "Barock" },
+{ title: "Wilhelm Tell Ouvertüre", artist: "Gioachino Rossini", origin: "Schweiz / Italien", genre: "Oper" },
+{ title: "Vogellisi", artist: "Schweizer Volkslied", origin: "Schweiz (Berner Oberland)", genre: "Volksmusik" },
+{ title: "Lueget, vo Bärgen und Tal", artist: "Ferdinand Huber", origin: "Schweiz", genre: "Traditionell" },
+{ title: "Bohemian Rhapsody", artist: "Queen", origin: "Grossbritannien", genre: "Rock" },
+{ title: "Imagine", artist: "John Lennon", origin: "Grossbritannien", genre: "Pop" },
+{ title: "Dancing Queen", artist: "ABBA", origin: "Schweden", genre: "Pop" },
+{ title: "La Vie en Rose", artist: "Édith Piaf", origin: "Frankreich", genre: "Chanson" },
+{ title: "Bella Ciao", artist: "Italienisches Volkslied", origin: "Italien", genre: "Folk" },
+{ title: "Für Elise", artist: "Ludwig van Beethoven", origin: "Deutschland", genre: "Klassik" },
+{ title: "Schwanensee", artist: "Pjotr Iljitsch Tschaikowski", origin: "Russland", genre: "Ballett" },
+{ title: "Billie Jean", artist: "Michael Jackson", origin: "USA", genre: "Pop" },
+{ title: "What a Wonderful World", artist: "Louis Armstrong", origin: "USA", genre: "Jazz" },
+{ title: "Take Five", artist: "Dave Brubeck Quartet", origin: "USA", genre: "Jazz (5/4-Takt)" },
+{ title: "Garota de Ipanema", artist: "Antônio Carlos Jobim", origin: "Brasilien", genre: "Bossa Nova" },
+{ title: "Despacito", artist: "Luis Fonsi", origin: "Puerto Rico", genre: "Latin Pop" },
+{ title: "La Bamba", artist: "Mexikanisches Volkslied", origin: "Mexiko", genre: "Son Jarocho" },
+{ title: "El Cóndor Pasa", artist: "Daniel Alomía Robles", origin: "Peru / Anden", genre: "Andenmusik" },
+{ title: "One Love", artist: "Bob Marley", origin: "Jamaika", genre: "Reggae" },
+{ title: "Sakura Sakura", artist: "Traditionelles Kirschblütenlied", origin: "Japan", genre: "Traditionell" },
+{ title: "Gangnam Style", artist: "PSY", origin: "Südkorea", genre: "K-Pop" },
+{ title: "Dynamite", artist: "BTS", origin: "Südkorea", genre: "K-Pop" },
+{ title: "Jai Ho", artist: "A. R. Rahman", origin: "Indien", genre: "Bollywood" },
+{ title: "Waka Waka (This Time for Africa)", artist: "Shakira & Freshlyground", origin: "Südafrika / Kolumbien", genre: "Afro-Pop" },
+{ title: "Jerusalema", artist: "Master KG", origin: "Südafrika", genre: "Amapiano" },
+{ title: "Pata Pata", artist: "Miriam Makeba", origin: "Südafrika", genre: "Afro-Jazz" },
+{ title: "Waltzing Matilda", artist: "Australisches Volkslied", origin: "Australien", genre: "Folk" },
+{ title: "Pokarekare Ana", artist: "Maori-Volkslied", origin: "Neuseeland", genre: "Traditionell" }
+];
+
+function playNotes(freqs) {
+try {
+const ctx = new (window.AudioContext || window.webkitAudioContext)();
+freqs.forEach((f, idx) => {
+const osc = ctx.createOscillator();
+const gain = ctx.createGain();
+osc.type = "triangle";
+osc.frequency.value = f;
+gain.gain.setValueAtTime(0.25, ctx.currentTime + idx * 0.35);
+gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.35 + 0.6);
+osc.connect(gain);
+gain.connect(ctx.destination);
+osc.start(ctx.currentTime + idx * 0.35);
+osc.stop(ctx.currentTime + idx * 0.35 + 0.65);
+});
+} catch (e) {}
+}
+
+const customTasks = { math: [], deutsch: [], music: [], french: [], english: [], italian: [], spanish: [], latin: [], code: [] };
+const r = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+const getTier = lvl => lvl <= 5000 ? 1 : lvl <= 25000 ? 2 : lvl <= 60000 ? 3 : 4;
+
+const generators = {
+math(lvl) {
+const tier = getTier(lvl), v = r(1, 3);
+if (tier === 1) {
+if (v === 1) {
+const a = r(12, 85), b = r(11, 79);
+return { icon: "📐", type: "mc", q: Kopfrechnen: ${a} + ${b} = ?, options: [String(a + b), String(a + b + 10), String(a + b - 2), String(a + b + 1)], a: [String(a + b)] };
+}
+if (v === 2) {
+const a = r(4, 15), b = r(3, 12);
+return { icon: "📐", type: "input", q: Einmaleins: ${a} × ${b} = ?, a: [String(a * b)] };
+}
+const h = r(8, 45);
+return { icon: "📐", type: "input", q: Was ist die Hälfte von ${h * 2}?, a: [String(h)] };
+}
+if (tier === 2) {
+const pctList = "10,20,25,50,75".split(",").map(Number);
+const pct = pctList[r(0, pctList.length - 1)];
+const base = r(4, 30) * 20;
+return { icon: "📐", type: "input", q: LP21 Prozent: ${pct}% von CHF ${base}.– = ?, a: [String((base * pct) / 100)] };
+}
+if (tier === 3) {
+const x = r(2, 22), a = r(3, 9), b = r(4, 30);
+return { icon: "🎓", type: "input", q: Gymi-Algebra: ${a}x + ${b} = ${a * x + b} → x = ?, a: [String(x), x=${x}, x = ${x}] };
+}
+const exp = r(3, 7), c = r(2, 6);
+return { icon: "🎓", type: "input", q: Matura-Analysis: Ableitung f'(x) von f(x) = ${c}x^${exp}:, a: [${c * exp}x^${exp - 1}] };
+},
+music(lvl) {
+const mode = r(1, 4);
+if (mode <= 2) {
+const song = worldSongs[r(0, worldSongs.length - 1)];
+const others = worldSongs.filter(s => s.title !== song.title).sort(() => Math.random() - 0.5).slice(0, 3);
+if (mode === 1) {
+return {
+icon: "🌍", type: "mc",
+q: Weltmusik: Aus welchem Land / welcher Region stammt «${song.title}» (${song.artist})?,
+options: [song.origin, ...others.map(o => o.origin)],
+a: [song.origin]
+};
+}
+return {
+icon: "🎵", type: "mc",
+q: Welthit-Wissen: Von wem stammt «${song.title}» (${song.origin})?,
+options: [song.artist, ...others.map(o => o.artist)],
+a: [song.artist]
+};
+}
+if (mode === 3) {
+const earTasks = [
+{ q: "Hör-Check: Welcher Akkord klingt fröhlich und hell?", freqs: [261.63, 329.63, 392.00], options: ["Dur-Dreiklang (C-Dur)", "Moll-Dreiklang (c-Moll)", "Oktave", "Sekunde"], a: ["Dur-Dreiklang (C-Dur)"] },
+{ q: "Hör-Check: Geht der zweite Ton nach OBEN oder nach UNTEN?", freqs: [261.63, 392.00], options: ["Nach oben (Quinte aufwärts)", "Nach unten", "Gleich hoch", "Kein Ton"], a: ["Nach oben (Quinte aufwärts)"] },
+{ q: "Hör-Check: Welcher Dreiklang klingt eher traurig/weich?", freqs: [261.63, 311.13, 392.00], options: ["Moll-Dreiklang (c-Moll)", "Dur-Dreiklang (C-Dur)", "Quarte", "Prime"], a: ["Moll-Dreiklang (c-Moll)"] }
+];
+const et = earTasks[r(0, earTasks.length - 1)];
+return { icon: "🎹", type: "mc", q: et.q, audioFreqs: et.freqs, options: et.options, a: et.a };
+}
+const theory = [
+{ icon: "🎼", type: "mc", q: "Wie viele Schläge hat eine halbe Note im 4/4-Takt?", options: ["2 Schläge", "4 Schläge", "1 Schlag", "3 Schläge"], a: ["2 Schläge"] },
+{ icon: "🎼", type: "mc", q: "Was bedeutet «forte» (f) in den Noten?", options: ["laut", "leise", "langsam", "abgehackt"], a: ["laut"] },
+{ icon: "🎼", type: "blocks", q: "Ordne die C-Dur-Tonleiter:", words: ["C", "D", "E", "F", "G", "A", "H", "C"], a: ["c d e f g a h c"] }
+];
+return theory[r(0, theory.length - 1)];
+},
+deutsch() {
+const bank = [
+{ icon: "📖", type: "mc", q: "LP21 Wortarten: Welches Wort ist ein Adjektiv (Wiewort)?", options: ["schnell", "laufen", "der Berg", "gestern"], a: ["schnell"] },
+{ icon: "📖", type: "mc", q: "Schweizer Rechtschreibung: Was ist richtig?", options: ["die Strasse", "die Straße", "die Strase", "die Straaße"], a: ["die Strasse"] },
+{ icon: "📖", type: "mc", q: "Welcher Fall? «Ich danke [meiner Lehrerin].»", options: ["Dativ", "Akkusativ", "Genitiv", "Nominativ"], a: ["Dativ"] },
+{ icon: "🎓", type: "mc", q: "Gymi-Fälle: «Wegen [des starken Windes] fiel das Fest aus.»", options: ["Genitiv", "Dativ", "Akkusativ", "Nominativ"], a: ["Genitiv"] }
+];
+return bank[r(0, bank.length - 1)];
+},
+french() {
+const bank = [
+{ icon: "🇫🇷", type: "mc", q: "dis donc! Was heisst « Merci beaucoup »?", options: ["Vielen Dank", "Guten Abend", "Auf Wiedersehen", "Bitte sehr"], a: ["Vielen Dank"] },
+{ icon: "🇫🇷", type: "blocks", q: "Baue: «Ich wohne in der Schweiz.»", words: ["J'habite", "en", "Suisse", "à", "tu", "Genève"], a: ["j'habite en suisse"] },
+{ icon: "🎓", type: "mc", q: "Passé composé: Nous _____ au cinéma hier.", options: ["sommes allés", "avons allé", "est allé", "sont allées"], a: ["sommes allés"] }
+];
+return bank[r(0, bank.length - 1)];
+},
+english() {
+const bank = [
+{ icon: "🇬🇧", type: "mc", q: "What is « der Bahnhof » in English?", options: ["train station", "airport", "library", "hospital"], a: ["train station"] },
+{ icon: "🇬🇧", type: "blocks", q: "Build: «Ich lerne gerne Englisch.»", words: ["I", "like", "learning", "English", "am", "learn"], a: ["i like learning english"] },
+{ icon: "🎓", type: "mc", q: "If-Clause Type 1: If it rains, we _____ at home.", options: ["will stay", "stayed", "would stay", "staying"], a: ["will stay"] }
+];
+return bank[r(0, bank.length - 1)];
+},
+italian() { return { icon: "🇮🇹", type: "mc", q: "Was heisst « Buongiorno »?", options: ["Guten Tag", "Gute Nacht", "Danke", "Tschüss"], a: ["Guten Tag"] }; },
+spanish() { return { icon: "🇪🇸", type: "mc", q: "Was heisst « ¿Cómo estás? »?", options: ["Wie geht es dir?", "Wo wohnst du?", "Wie heisst du?", "Wie spät ist es?"], a: ["Wie geht es dir?"] }; },
+latin() { return { icon: "🏛️", type: "mc", q: "prima.nova: Was bedeutet « amicus »?", options: ["der Freund", "der Feind", "das Haus", "der König"], a: ["der Freund"] }; },
+code() { return { icon: "💻", type: "mc", q: "LP21 Informatik: Wozu dient eine Schleife (Loop)?", options: ["Befehle wiederholen", "Bildschirm ausschalten", "Passwort löschen", "Drucker installieren"], a: ["Befehle wiederholen"] }; }
+};
+
+let voxelLoop = null;
+function loadRealGame(type) {
+if (voxelLoop) { clearInterval(voxelLoop); voxelLoop = null; }
+const box = document.getElementById("realGameBox");
+if (type === "lichess") box.innerHTML = <h3 style="margin-bottom:8px;">♟️ Echtes Lichess.org Schach</h3><iframe class="game-iframe" src="https://lichess.org" allowtransparency="true"></iframe>;
+else if (type === "2048") box.innerHTML = <h3 style="margin-bottom:8px;">🔢 Echtes 2048</h3><iframe class="game-iframe" src="https://play2048.co"></iframe>;
+else if (type === "hextris") box.innerHTML = <h3 style="margin-bottom:8px;">🔷 Echtes Hextris</h3><iframe class="game-iframe" src="https://hextris.io"></iframe>;
+else if (type === "hexgl") box.innerHTML = <h3 style="margin-bottom:8px;">🏎️ Echtes HexGL 3D</h3><iframe class="game-iframe" src="https://bkcore.com"></iframe>;
+else if (type === "minesweeper") initMinesweeper(box);
+else if (type === "voxel") initVoxel3D(box);
+}
+
+function initMinesweeper(box) {
+const size = 8, minesCount = 10;
+const grid = Array.from({ length: size }, () => Array.from({ length: size }, () => ({ mine: false, open: false, n: 0 })));
+let placed = 0;
+while (placed < minesCount) {
+const rr = r(0, size - 1), cc = r(0, size - 1);
+if (!grid[rr][cc].mine) { grid[rr][cc].mine = true; placed++; }
+}
+for (let row = 0; row < size; row++) {
+for (let col = 0; col < size; col++) {
+let cnt = 0;
+for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+const nr = row + dr, nc = col + dc;
+if (nr >= 0 && nr < size && nc >= 0 && nc < size && grid[nr][nc].mine) cnt++;
+}
+grid[row][col].n = cnt;
+}
+}
+function drawMS(over) {
+let html = <h3 style="margin-bottom:8px;">💣 Minesweeper (10 Minen)</h3><div style="display:grid;grid-template-columns:repeat(8,38px);gap:4px;justify-content:center;margin:12px 0;">;
+for (let row = 0; row < size; row++) for (let col = 0; col < size; col++) {
+const cell = grid[row][col];
+const bg = cell.open ? (cell.mine ? "#ef4444" : "#334155") : "#1e293b";
+const txt = cell.open ? (cell.mine ? "💣" : cell.n > 0 ? cell.n : "") : "";
+html += <button onclick="openMS(${row},${col})" style="width:38px;height:38px;border-radius:8px;border:2px solid #475569;background:${bg};color:#fff;font-weight:900;cursor:pointer;">${txt}</button>;
+}
+html += </div>;
+if (over) html += <p style="color:#f87171;font-weight:900;text-align:center;">💥 Bombe!</p><button class="btn-primary" style="display:block;margin:8px auto;" onclick="loadRealGame('minesweeper')">Neues Feld</button>;
+box.innerHTML = html;
+}
+window.openMS = function(row, col) {
+const cell = grid[row][col];
+if (cell.open) return;
+cell.open = true;
+if (cell.mine) { grid.forEach(rw => rw.forEach(x => { if (x.mine) x.open = true; })); drawMS(true); return; }
+if (cell.n === 0) for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+const nr = row + dr, nc = col + dc;
+if (nr >= 0 && nr < size && nc >= 0 && nc < size) window.openMS(nr, nc);
+}
+drawMS(false);
+};
+drawMS(false);
+}
+
+function initVoxel3D(box) {
+box.innerHTML = <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px;"> <h3>⛏️ 3D-Blockwelt</h3><div><button class="pill-btn" onclick="voxelAdd()">🧱 Bauen</button> <button class="pill-btn" onclick="voxelRemove()">⛏️ Abbauen</button> <button class="pill-btn" onclick="voxelColor()">🎨 Farbe</button></div></div> <canvas id="voxCanvas" width="660" height="330" style="width:100%;height:auto;border-radius:12px;background:#38bdf8;display:block;"></canvas>;
+const colors = ["#22c55e", "#b45309", "#64748b", "#3b82f6", "#eab308"];
+let colIdx = 0, angle = 0.6;
+const blocks = [];
+for (let x = -2; x <= 2; x++) for (let z = -2; z <= 2; z++) blocks.push({ x, y: 0, z, c: "#22c55e" });
+window.voxelColor = () => { colIdx = (colIdx + 1) % colors.length; };
+window.voxelAdd = () => blocks.push({ x: r(-2, 2), y: r(1, 3), z: r(-2, 2), c: colors[colIdx] });
+window.voxelRemove = () => { if (blocks.length > 5) blocks.pop(); };
+voxelLoop = setInterval(() => {
+const cv = document.getElementById("voxCanvas");
+if (!cv) { clearInterval(voxelLoop); return; }
+const ctx = cv.getContext("2d");
+angle += 0.02;
+ctx.clearRect(0, 0, 660, 330);
+[...blocks].sort((a, b) => (a.x * Math.sin(angle) + a.z * Math.cos(angle)) - (b.x * Math.sin(angle) + b.z * Math.cos(angle))).forEach(b => {
+const rx = b.x * Math.cos(angle) - b.z * Math.sin(angle);
+const rz = b.x * Math.sin(angle) + b.z * Math.cos(angle);
+const sx = 330 + rx * 42, sy = 205 + rz * 20 - b.y * 36;
+ctx.fillStyle = b.c; ctx.fillRect(sx - 18, sy - 18, 36, 36);
+ctx.strokeStyle = "#0f172a"; ctx.lineWidth = 2; ctx.strokeRect(sx - 18, sy - 18, 36, 36);
+});
+}, 50);
+}
+
+let currentWorld = 1, gameMode = "path", sessionTasks = [], sessionIdx = 0, placementHits = 0, checked = false, selMc = null, selWords = [], bankWords = [];
+const norm = s => String(s).trim().toLowerCase().replace(/[’‘`]/g, "'").replace(/[.!?]+$/g, "").replace(/\s+/g, " ");
+
+function openTab(tab) {
+if (tab === "admin" && !isAdminAuthenticated) return;
+if (voxelLoop) { clearInterval(voxelLoop); voxelLoop = null; }
+document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+document.getElementById("view-" + tab).classList.add("active");
+const nav = document.getElementById("nav-" + tab);
+if (nav) nav.classList.add("active");
+if (tab === "path") renderPath();
+if (tab === "games" && !document.getElementById("realGameBox").querySelector("iframe,canvas,button")) loadRealGame("lichess");
+}
+
+function onSubjectChange() {
+const subj = document.getElementById("subjectSelect").value;
+currentWorld = Math.ceil((state.levels[subj] || 1) / 10);
+renderPath();
+}
+
+function goToCurrentWorld() {
+const subj = document.getElementById("subjectSelect").value;
+currentWorld = Math.ceil((state.levels[subj] || 1) / 10);
+renderPath();
+}
+
+function changeWorld(delta) {
+const maxW = Math.ceil(cfg.maxLevels / 10);
+currentWorld = Math.max(1, Math.min(maxW, currentWorld + delta));
+renderPath();
+}
+
+function renderPath() {
+save();
+const subj = document.getElementById("subjectSelect").value;
+const unlockedLvl = cfg.unlockAll ? cfg.maxLevels : (state.levels[subj] || 1);
+const maxW = Math.ceil(cfg.maxLevels / 10);
+if (currentWorld > maxW) currentWorld = maxW;
+
+const startLvl = (currentWorld - 1) * 10 + 1;
+const endLvl = Math.min(currentWorld * 10, cfg.maxLevels);
+document.getElementById("worldTitle").innerText = Welt ${currentWorld.toLocaleString("de-CH")} / ${maxW.toLocaleString("de-CH")} (Lvl ${startLvl.toLocaleString("de-CH")}–${endLvl.toLocaleString("de-CH")});
+
+const box = document.getElementById("pathContainer");
+box.innerHTML = "";
+
+const tierName = startLvl <= 5000 ? "LP21 Grundlagen" : startLvl <= 25000 ? "Sekundarstufe I" : startLvl <= 60000 ? "Gymi & Meisterklasse" : "Grandmaster 100k";
+const bClass = startLvl <= 5000 ? "" : startLvl <= 25000 ? "blue" : startLvl <= 60000 ? "purple" : "dark";
+
+const banner = document.createElement("div");
+banner.className = "unit-banner " + bClass;
+banner.innerHTML = <div><h2>${tierName}</h2><p>${cfg.tasksPerLevel} Aufgaben/Level • ${cfg.maxLevels.toLocaleString("de-CH")} Level</p></div><strong>${Math.min(100, Math.round((unlockedLvl / cfg.maxLevels) * 100))}%</strong>;
+box.appendChild(banner);
+
+const grid = document.createElement("div");
+grid.className = "path-grid";
+
+for (let lvl = startLvl; lvl <= endLvl; lvl++) {
+const isBoss = lvl % 5 === 0, isDone = lvl < unlockedLvl, isCurrent = lvl === unlockedLvl, isLocked = lvl > unlockedLvl;
+const wrap = document.createElement("div");
+wrap.className = "node-wrap";
+wrap.style.transform = translateX(${Math.sin(lvl) * 32}px);
+if (isCurrent) wrap.innerHTML += <div class="start-tag">START</div>;
+
+const btn = document.createElement("button");
+btn.className = "node-btn" + (isDone ? " done" : isLocked ? " locked" : isBoss ? " boss" : "");
+btn.innerText = isDone ? "✓" : isLocked ? "🔒" : isBoss ? "👑" : lvl;
+btn.disabled = isLocked;
+if (!isLocked) btn.onclick = () => startSession("path", lvl, cfg.tasksPerLevel);
+
+const lbl = document.createElement("div");
+lbl.className = "node-label";
+lbl.innerText = isLocked ? Level ${lvl.toLocaleString("de-CH")} : Level ${lvl.toLocaleString("de-CH")} (${cfg.tasksPerLevel} Aufg.);
+
+wrap.appendChild(btn);
+wrap.appendChild(lbl);
+grid.appendChild(wrap);
+}
+box.appendChild(grid);
+}
+
+function startPlacementTest() {
+const subj = document.getElementById("subjectSelect").value;
+const lvls = "500,3000,10000,25000,45000,70000,90000".split(",").map(Number);
+sessionTasks = lvls.map(l => ({ ...generatorssubj, targetLvl: l }));
+gameMode = "placement"; placementHits = 0; sessionIdx = 0; hearts = cfg.maxHearts;
+save(); openTab("practice"); renderTask();
+}
+
+function startSession(mode, lvl, count) {
+const subj = document.getElementById("subjectSelect").value;
+gameMode = mode; sessionIdx = 0; hearts = cfg.maxHearts;
+sessionTasks = [];
+const extra = customTasks[subj] || [];
+for (let i = 0; i < extra.length && sessionTasks.length < count; i++) sessionTasks.push({ ...extra[i], targetLvl: lvl });
+while (sessionTasks.length < count) sessionTasks.push({ ...generatorssubj, targetLvl: lvl });
+save(); openTab("practice"); renderTask();
+}
+
+function addChar(ch) {
+const inp = document.getElementById("textInput");
+if (!inp || checked) return;
+inp.value += ch; inp.focus();
+}
+
+function renderTask() {
+checked = false; selMc = null; selWords = [];
+const task = sessionTasks[sessionIdx];
+document.getElementById("progFill").style.width = Math.round((sessionIdx / sessionTasks.length) * 100) + "%";
+document.getElementById("qIcon").innerText = task.icon || "🦉";
+document.getElementById("qTitle").innerText = (${sessionIdx + 1}/${sessionTasks.length}) ${task.q};
+
+const audioBox = document.getElementById("audioPromptBox");
+if (task.audioFreqs) {
+audioBox.style.display = "block";
+audioBox.innerHTML = <button class="pill-btn gold" onclick="playNotes([${task.audioFreqs.join(",")}])">🔊 Klavier-Töne anhören</button>;
+playNotes(task.audioFreqs);
+} else {
+audioBox.style.display = "none";
+}
+
+const panel = document.getElementById("checkPanel");
+panel.className = "check-panel";
+document.getElementById("checkMsg").innerText = Level ${task.targetLvl.toLocaleString("de-CH")};
+document.getElementById("actionBtn").innerText = "Prüfen";
+
+["area-mc", "area-input", "area-blocks", "area-code"].forEach(id => document.getElementById(id).style.display = "none");
+
+if (task.type === "mc") {
+const area = document.getElementById("area-mc");
+area.style.display = "grid"; area.innerHTML = "";
+[...task.options].sort(() => Math.random() - 0.5).forEach(opt => {
+const card = document.createElement("div");
+card.className = "choice-card"; card.innerText = opt;
+card.onclick = () => {
+if (checked) return;
+document.querySelectorAll(".choice-card").forEach(c => c.classList.remove("selected"));
+card.classList.add("selected"); selMc = opt;
+};
+area.appendChild(card);
+});
+} else if (task.type === "blocks") {
+document.getElementById("area-blocks").style.display = "block";
+bankWords = [...task.words].sort(() => Math.random() - 0.5).map((w, i) => ({ id: i, text: w, used: false }));
+renderBlocksUI();
+} else if (task.type === "code") {
+document.getElementById("area-code").style.display = "block";
+document.getElementById("codeInput").value = task.starter || "";
+} else {
+document.getElementById("area-input").style.display = "block";
+const inp = document.getElementById("textInput"); inp.value = ""; inp.focus();
+}
+}
+
+function renderBlocksUI() {
+const slot = document.getElementById("slotBox"), bank = document.getElementById("bankBox");
+slot.innerHTML = ""; bank.innerHTML = "";
+selWords.forEach((item, idx) => {
+const chip = document.createElement("button");
+chip.className = "word-chip"; chip.innerText = item.text;
+chip.onclick = () => { if (!checked) { item.used = false; selWords.splice(idx, 1); renderBlocksUI(); } };
+slot.appendChild(chip);
+});
+bankWords.forEach(item => {
+const chip = document.createElement("button");
+chip.className = "word-chip" + (item.used ? " used" : ""); chip.innerText = item.text;
+chip.onclick = () => { if (!checked && !item.used) { item.used = true; selWords.push(item); renderBlocksUI(); } };
+bank.appendChild(chip);
+});
+}
+
+function submitOrNext() {
+const task = sessionTasks[sessionIdx];
+const panel = document.getElementById("checkPanel"), msg = document.getElementById("checkMsg"), btn = document.getElementById("actionBtn");
+
+if (!checked) {
+let userAns = task.type === "mc" ? (selMc || "") : task.type === "blocks" ? selWords.map(w => w.text).join(" ") : task.type === "code" ? document.getElementById("codeInput").value : document.getElementById("textInput").value;
+if (!norm(userAns)) { msg.innerText = "⚠️ Bitte gib zuerst eine Antwort ein!"; return; }
+checked = true;
+const isOk = (task.a || []).map(norm).includes(norm(userAns));
+if (isOk) {
+const xpGain = 10 * cfg.xpMultiplier;
+state.xp += xpGain;
+if (gameMode === "placement") placementHits++;
+panel.className = "check-panel correct";
+msg.innerText = 🎉 Richtig! +${xpGain} XP;
+} else {
+hearts = Math.max(0, hearts - 1);
+panel.className = "check-panel wrong";
+msg.innerText = ❌ Falsch! Lösung: ${task.a[0]};
+}
+save(); btn.innerText = "Weiter";
+} else {
+if (hearts <= 0 && gameMode !== "placement") {
+alert("💔 Keine Herzen mehr! Versuch es gleich noch einmal.");
+hearts = cfg.maxHearts; openTab("path"); return;
+}
+sessionIdx++;
+if (sessionIdx < sessionTasks.length) renderTask();
+else finishSession();
+}
+}
+
+function finishSession() {
+document.getElementById("progFill").style.width = "100%";
+const subj = document.getElementById("subjectSelect").value;
+if (gameMode === "placement") {
+const target = Math.min(cfg.maxLevels, Math.max(1, placementHits * 14000));
+state.levels[subj] = Math.max(state.levels[subj] || 1, target);
+currentWorld = Math.ceil(state.levels[subj] / 10);
+save();
+alert(🧠 KI-Einstufung: ${placementHits}/${sessionTasks.length} richtig → Start auf Level ${state.levels[subj].toLocaleString("de-CH")}!);
+} else {
+const doneLvl = sessionTasks[0].targetLvl;
+if (doneLvl >= (state.levels[subj] || 1) && doneLvl < cfg.maxLevels) state.levels[subj] = doneLvl + 1;
+const bonus = 50 * cfg.xpMultiplier;
+state.xp += bonus; hearts = cfg.maxHearts;
+save();
+alert(🏆 Level ${doneLvl.toLocaleString("de-CH")} abgeschlossen! +${bonus} Bonus-XP!);
+}
+openTab("path");
+}
+
+function askSuperAI() {
+const inp = document.getElementById("aiPromptInput"), box = document.getElementById("aiChatBox");
+const q = inp.value.trim();
+if (!q) return;
+box.innerHTML += <div class="msg-user">${q}</div>;
+inp.value = "";
+
+const low = q.toLowerCase();
+let ans = "";
+
+const pct = low.match(/^([\d.,]+)\s*%\svon\s([\d.,]+)$/);
+const frac = low.match(/^(\d+)\s*/\s*(\d+)\s*([+-/:])\s(\d+)\s*/\s*(\d+)$/);
+const quad = low.replace(/\s+/g, "").match(/^x^2([+-]\d+)?=(\d+)$/);
+const lin = low.replace(/\s+/g, "").match(/^([+-]?\d*)x([+-]\d+)=([+-]?\d+)$/);
+
+if (pct) {
+const p = parseFloat(pct[1].replace(",", ".")), b = parseFloat(pct[2].replace(",", "."));
+ans = 📐 <strong>Prozent-Rechenweg:</strong><br>1. Formel: <code>Grundwert × Prozentsatz ÷ 100</code><br>2. Rechnung: <code>${b} × ${p} ÷ 100</code> = <strong>${(b * p) / 100}</strong>;
+} else if (frac) {
+const n1 = +frac[1], d1 = +frac[2], op = frac[3], n2 = +frac[4], d2 = +frac[5];
+let rn = 0, rd = d1 * d2;
+if (op === "+") rn = n1 * d2 + n2 * d1;
+else if (op === "-") rn = n1 * d2 - n2 * d1;
+else if (op === "") rn = n1 * n2;
+else { rn = n1 * d2; rd = d1 * n2; }
+const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+const g = Math.abs(gcd(rn, rd)) || 1;
+ans = 📐 <strong>Bruch-Rechenweg:</strong><br>Ergebnis ungekürzt: <code>${rn}/${rd}</code><br>Gekürzt: <strong>${rn / g}/${rd / g}</strong> (≈ ${(rn / rd).toFixed(3)});
+} else if (quad) {
+const shift = quad[1] ? parseFloat(quad[1]) : 0, rhs = parseFloat(quad[2]) - shift;
+ans = rhs < 0
+? 📐 <strong>Quadratische Gleichung:</strong> <code>x² = ${rhs}</code> hat keine reelle Lösung.
+: 📐 <strong>Quadratische Gleichung:</strong><br>1. <code>x² = ${rhs}</code><br>2. Wurzel ziehen: <strong>x₁ = +${Math.sqrt(rhs)}</strong> und <strong>x₂ = -${Math.sqrt(rhs)}</strong>;
+} else if (lin) {
+const a = lin[1] === "" || lin[1] === "+" ? 1 : lin[1] === "-" ? -1 : parseFloat(lin[1]);
+const b = parseFloat(lin[2]), c = parseFloat(lin[3]), x = (c - b) / a;
+ans = 📐 <strong>Gleichung lösen:</strong><br>1. <code>${a}x ${b >= 0 ? "+ " + b : "- " + Math.abs(b)} = ${c}</code><br>2. <code>${a}x = ${c - b}</code><br>3. Durch ${a} teilen → <strong>x = ${x}</strong>;
+} else if (/^[0-9+-/().\s×÷,]+$/.test(q)) {
+try {
+const res = Function('"use strict"; return (' + q.replace(/×/g, "*").replace(/÷/g, "/").replace(/,/g, ".") + ')')();
+ans = 📐 <strong>Ergebnis:</strong> <code>${q}</code> = <strong>${res}</strong>;
+} catch (e) { ans = "Bitte prüfe die Klammern in deinem Rechenausdruck."; }
+} else if (low.includes("lied") || low.includes("song") || low.includes("musik") || low.includes("tonart") || low.includes("kreuz")) {
+const foundSong = worldSongs.find(s => low.includes(s.title.toLowerCase()) || low.includes(s.artist.toLowerCase()));
+if (foundSong) {
+ans = 🎵 <strong>Weltmusik-Info:</strong> «${foundSong.title}» stammt von <strong>${foundSong.artist}</strong> (${foundSong.origin}, Genre: ${foundSong.genre}).;
+} else {
+ans = 🎵 <strong>Musik-Wissen:</strong> Wir haben <strong>${worldSongs.length} Weltlieder</strong> sowie Gehörbildung im Fach «Musik & Weltlieder»! Merksatz für Kreuz-Tonarten: <em>Geh Du Alter Esel Hole Fische</em> (G=1#, D=2#, A=3#, E=4#, H=5#, Fis=6#).;
+}
+} else if (low.includes("passé") || low.includes("franz") || low.includes("être")) {
+ans = 🇫🇷 <strong>Passé composé:</strong> Formel = <code>avoir/être (Präsens) + Participe passé</code>.<br>Beispiel: <em>J'ai mangé</em> oder <em>Elle est allée</em>.;
+} else if (low.includes("fall") || low.includes("fälle") || low.includes("genitiv") || low.includes("dativ")) {
+ans = 📖 <strong>Die 4 Fälle im Deutschen:</strong><br>• 1. Nominativ (Wer/Was?)<br>• 2. Genitiv (Wessen?)<br>• 3. Dativ (Wem?)<br>• 4. Akkusativ (Wen/Was?);
+} else {
+ans = 🤖 <strong>EduSwiss Super-KI:</strong> Du kannst mir direkt Rechenaufgaben (z.B. <code>3/4 + 2/5</code>, <code>3x + 6 = 21</code>, <code>25% von 480</code>), Fragen zu Weltliedern/Musiktheorie oder Grammatikregeln stellen!;
+}
+
+setTimeout(() => {
+box.innerHTML += <div class="msg-ai">${ans}</div>;
+box.scrollTop = box.scrollHeight;
+}, 200);
+}
+
+function generatePitch(target) {
+const out = document.getElementById("pitchOutput");
+const pitches = {
+kollege: <strong>🔥 Nachricht für Schulkollegen:</strong><br><br>«Mal ehrlich: Trockene Arbeitsblätter nerven – und am Schluss weiss man trotzdem nicht, wo man steht. Ich nutze jetzt <strong>EduSwiss LP21</strong>: Wie Duolingo für alle Schulfächer (inkl. Weltmusik-Quiz mit Klavier-Sounds, KI-Rechenweg-Erklärer und 100'000 Levels) – plus Lichess Schach, 2048 & 3D-Blockwelt für die Pause. Test es kurz aus und schick mir deinen Sync-Code!»,
+lehrer: <strong>👩‍🏫 Pitch für Lehrpersonen / Schulleitung:</strong><br><br>«Guten Tag, ich möchte Ihnen kurz <strong>EduSwiss LP21</strong> zeigen – ein digitales Lernwerkzeug für den Lehrplan 21: Sofort startklar im Browser ohne Installation oder Werbung, 100'000 adaptive Stufen von Einstieg bis Gymi/Matura sowie ein integrierter KI-Tutor, der Rechenwege Schritt für Schritt erklärt. Darf ich es Ihnen in 2 Minuten zeigen?»,
+eltern: <strong>👨‍👩‍👧 Argumente für Eltern:</strong><br><br>«Statt passiv zu scrollen, verbindet <strong>EduSwiss LP21</strong> Prüfungstraining nach Schweizer Lehrplan 21 mit direkter Motivation: Der KI-Tutor erklärt Fehler sofort verständlich und die Denkspiele fördern die Konzentration – komplett kostenlos und ohne Tracking.»,
+einwand: <strong>🛡️ Einwandbehandlung («Hab keine Zeit»):</strong><br><br>«Genau deshalb spart es Zeit: Mit dem <strong>🧠 KI-Einstufungstest</strong> überspringst du alles, was du schon kannst, und übst nur noch deine Lücken – 5 Minuten reichen.»
+};
+out.innerHTML = pitches[target] || pitches.kollege;
+}
+
+function copyPitch() {
+const txt = document.getElementById("pitchOutput").innerText;
+if (navigator.clipboard) {
+navigator.clipboard.writeText(txt).then(() => alert("📋 Pitch-Text kopiert!"));
+} else {
+prompt("Text kopieren:", txt);
+}
+}
+
+applyBanner();
+onSubjectChange();
